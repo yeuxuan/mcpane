@@ -6,27 +6,31 @@
 
 ## 下载
 
-到 [Releases](https://github.com/yeuxuan/mcpane/releases/latest) 取对应架构的
-安装包，要求 macOS 12.0 及以上：
+到 [Releases](https://github.com/yeuxuan/mcpane/releases/latest) 取对应平台的安装包：
 
-| 你的 Mac | 下载 |
-|---|---|
-| Apple Silicon（M 系列） | `MCPane_x.y.z_aarch64.dmg` |
-| Intel | `MCPane_x.y.z_x64.dmg` |
+| 平台 | 下载 | 系统要求 |
+|---|---|---|
+| macOS · Apple Silicon（M 系列） | `MCPane_x.y.z_aarch64.dmg` | macOS 12.0+ |
+| macOS · Intel | `MCPane_x.y.z_x64.dmg` | macOS 12.0+ |
+| Windows · x64 | `MCPane_x.y.z_x64-setup.exe` | Windows 10 1803+ |
 
-不确定是哪种：左上角  → 关于本机，看「芯片」一行。
-
-Windows 版尚未发布。
+不确定 Mac 是哪种芯片：左上角  → 关于本机，看「芯片」一行。
 
 ## 首次打开
 
-当前安装包未经 Apple 公证，首次打开会提示「无法验证开发者」。放行方式：
+当前安装包未经代码签名，首次打开会被系统拦下。放行一次即可，
+此后的版本升级由应用内自动更新接管，不会再触发。
+
+**macOS**——提示「无法验证开发者」：
 
 1. 双击一次（会被拦下），点「完成」
 2. 打开「系统设置 → 隐私与安全性」，滚到底部会看到 MCPane 被阻止的提示
 3. 点「仍要打开」，再确认一次
 
-只需做一次。此后的版本升级由应用内自动更新接管，不会再触发该提示。
+**Windows**——SmartScreen 提示「已保护你的电脑」：
+
+1. 点提示里的「更多信息」
+2. 点「仍要运行」
 
 ## 功能
 
@@ -43,6 +47,8 @@ Windows 版尚未发布。
   任意变更可回滚，外部改动不静默覆盖
 - **观测** —— 请求日志、近 24 小时聚合统计、会话成本估算
 - **数据** —— 本地备份与 WebDAV / S3 云同步
+- **常驻后台** —— 系统托盘常驻，可设为开机自启：登录后静默驻留托盘，
+  不弹窗口、不占 Dock，Hub 随之就位
 
 ## 更新
 
