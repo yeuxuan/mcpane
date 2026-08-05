@@ -8,10 +8,7 @@
 
 本仓库用于分发 MCPane 安装包，不含源代码。
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="screenshots/dashboard-dark.png">
-  <img src="screenshots/dashboard-light.png" alt="概览页：MCP Hub 运行状态、已接入的客户端与下游服务一目了然">
-</picture>
+![概览页：MCP Hub 运行状态、已接入的客户端与下游服务一目了然](screenshots/dashboard.png)
 
 ## 下载
 
@@ -59,15 +56,9 @@
 - **数据在自己手里**——本地自动备份，可选 WebDAV / S3 云同步
 - **安静常驻**——系统托盘常驻、可开机自启，不弹窗口、不占 Dock
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="screenshots/servers-dark.png">
-  <img src="screenshots/servers-light.png" alt="MCP 服务器页：逐个启停、工具计数与运行状态">
-</picture>
+![MCP 服务器页：逐个启停、工具计数与运行状态](screenshots/servers.png)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="screenshots/clients-dark.png">
-  <img src="screenshots/clients-light.png" alt="客户端页：八家客户端的检测与一键接入">
-</picture>
+![客户端页：八家客户端的检测与一键接入](screenshots/clients.png)
 
 ## 更新
 
