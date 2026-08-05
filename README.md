@@ -85,7 +85,13 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 如果 MCPane 对你有帮助，欢迎点一颗 Star——这也是我们了解关注度的主要途径。
 
-[![Star History Chart][star-history-chart]][star-history-link]
+<a href="https://www.star-history.com/#yeuxuan/mcpane&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date" />
+  </picture>
+</a>
 
 ---
 
@@ -103,5 +109,3 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 [downloads-shield]: https://img.shields.io/github/downloads/yeuxuan/mcpane/total?style=flat-square&color=45cc11
 [platform-shield]: https://img.shields.io/badge/platform-macOS%20%7C%20Windows-8A2BE2?style=flat-square
 [release-date-shield]: https://img.shields.io/github/release-date/yeuxuan/mcpane?style=flat-square&label=released
-[star-history-chart]: https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date
-[star-history-link]: https://www.star-history.com/#yeuxuan/mcpane&Date
