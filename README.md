@@ -85,13 +85,11 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 如果 MCPane 对你有帮助，欢迎点一颗 Star——这也是我们了解关注度的主要途径。
 
-<a href="https://www.star-history.com/#yeuxuan/mcpane&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=yeuxuan/mcpane&type=Date" />
-  </picture>
-</a>
+在 [star-history.com](https://www.star-history.com/#yeuxuan/mcpane&Date) 查看本仓库的 Star 增长曲线。
+
+<!-- Star History 图表：star-history 现要求仓库所有者用 GitHub token 在官网签发
+     sealed_token 嵌入（GitHub 已限制 stargazers API 匿名访问）。
+     签发后把 <picture> 嵌入代码贴回此处替换上面一行。 -->
 
 ---
 
