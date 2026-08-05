@@ -85,11 +85,11 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 如果 MCPane 对你有帮助，欢迎点一颗 Star——这也是我们了解关注度的主要途径。
 
-<a href="https://www.star-history.com/?repos=yeuxuan%2Fmcpane&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=yeuxuan%2Fmcpane.git&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=yeuxuan/mcpane&type=date&theme=dark&legend=top-left&sealed_token=x8PzUFKkWQSfqcuu3OFhLVDHYgV2-KrmT7uQABMrMw1_8fK0LWLelfjLRuOmVN-diBTPmOSqvn4m-dqUQLXSBNbjklN3WH_QkFZHc5fXzelebR4yQU4-Zg" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=yeuxuan/mcpane&type=date&legend=top-left&sealed_token=x8PzUFKkWQSfqcuu3OFhLVDHYgV2-KrmT7uQABMrMw1_8fK0LWLelfjLRuOmVN-diBTPmOSqvn4m-dqUQLXSBNbjklN3WH_QkFZHc5fXzelebR4yQU4-Zg" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=yeuxuan/mcpane&type=date&legend=top-left&sealed_token=x8PzUFKkWQSfqcuu3OFhLVDHYgV2-KrmT7uQABMrMw1_8fK0LWLelfjLRuOmVN-diBTPmOSqvn4m-dqUQLXSBNbjklN3WH_QkFZHc5fXzelebR4yQU4-Zg" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=yeuxuan/mcpane.git&type=date&theme=dark&legend=top-left&sealed_token=pa8e2C4rCj7E3dYR3JdJRwH5IBgAokKYhK5g_dyCqRkQ5YkXJPDT-RzD4pUtFO-GFiUJbH4SPMUeMOfJKfyvm3Tv7GaLC78cgjT5QxZ3_Hj_v65HsoI_hQ" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=yeuxuan/mcpane.git&type=date&legend=top-left&sealed_token=pa8e2C4rCj7E3dYR3JdJRwH5IBgAokKYhK5g_dyCqRkQ5YkXJPDT-RzD4pUtFO-GFiUJbH4SPMUeMOfJKfyvm3Tv7GaLC78cgjT5QxZ3_Hj_v65HsoI_hQ" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=yeuxuan/mcpane.git&type=date&legend=top-left&sealed_token=pa8e2C4rCj7E3dYR3JdJRwH5IBgAokKYhK5g_dyCqRkQ5YkXJPDT-RzD4pUtFO-GFiUJbH4SPMUeMOfJKfyvm3Tv7GaLC78cgjT5QxZ3_Hj_v65HsoI_hQ" />
  </picture>
 </a>
 

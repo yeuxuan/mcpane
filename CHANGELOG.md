@@ -7,7 +7,7 @@ MCPane 每个版本改了什么、对你有什么影响，都记在这里。格�
 本文件同时用作 GitHub Release 描述与应用内更新提示，面向使用者书写：
 只写用户能感知的变化，实现细节与根因分析留在提交记录里。
 
-## [Unreleased]
+## [0.2.1] - 2026-08-05
 
 ### 变更
 
@@ -116,6 +116,6 @@ MCPane 是 Claude Code、Codex 与 MCP 工具的统一控制面，这一版包�
 - **安装包未经 Apple 公证**，首次打开会被系统拦下，需在
   「系统设置 → 隐私与安全性」中点「仍要打开」
 
-[Unreleased]: https://github.com/yeuxuan/mcpane/compare/v0.2.0...HEAD
+[0.2.1]: https://github.com/yeuxuan/mcpane/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/yeuxuan/mcpane/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yeuxuan/mcpane/releases/tag/v0.1.0
