@@ -48,9 +48,10 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 | 平台 | 安装包 | 系统要求 |
 | --- | --- | --- |
-| macOS（Apple Silicon） | `MCPane_x.y.z_aarch64.dmg` | macOS 12.0 及以上 |
-| macOS（Intel） | `MCPane_x.y.z_x64.dmg` | macOS 12.0 及以上 |
-| Windows（x64） | `MCPane_x.y.z_x64-setup.exe` | Windows 10 1803 及以上 |
+| macOS（Apple Silicon） | `MCPane_x.y.z_macos-aarch64.dmg` | macOS 12.0 及以上 |
+| macOS（Intel） | `MCPane_x.y.z_macos-x86_64.dmg` | macOS 12.0 及以上 |
+| Windows（x64） | `MCPane_x.y.z_windows-x86_64-setup.exe` | Windows 10 1803 及以上 |
+| Linux（x64） | `MCPane_x.y.z_linux-x86_64.AppImage` | glibc 2.31 及以上（Ubuntu 20.04+） |
 
 > 如不确定 Mac 芯片类型：点击左上角苹果菜单 →「关于本机」，查看「芯片」一行。
 
@@ -69,6 +70,11 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 1. 点击提示中的「更多信息」
 2. 点击「仍要运行」
+
+**Linux**（AppImage 下载后默认没有执行权限）：
+
+1. `chmod +x MCPane_x.y.z_linux-x86_64.AppImage`
+2. 双击或在终端里直接运行该文件
 
 ### 自动更新
 

@@ -10,6 +10,19 @@ MCPane 每个版本改了什么、对你有什么影响，都记在这里。格�
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-12
+
+### 新增
+
+- 首次提供 Linux 版本（AppImage，x86_64）
+
+### 修复
+
+- 恢复 Windows 版发布。上一版 0.3.1 因打包问题只发布了 macOS，Windows 用户
+  升级到本版即可一并获得 0.3.1 的全部修复（Dock/Finder 启动后服务器状态与
+  客户端安装状态显示错误、下游重连失败误伤既有连接、操作失败无明确提示）
+- macOS 用户由 0.3.1 升级至本版没有功能变化
+
 ## [0.3.1] - 2026-08-12
 
 ### 修复
@@ -235,7 +248,8 @@ MCPane 是 Claude Code、Codex 与 MCP 工具的统一控制面，这一版包�
 - **安装包未经 Apple 公证**，首次打开会被系统拦下，需在
   「系统设置 → 隐私与安全性」中点「仍要打开」
 
-[Unreleased]: https://github.com/yeuxuan/mcpane/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/yeuxuan/mcpane/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/yeuxuan/mcpane/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/yeuxuan/mcpane/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/yeuxuan/mcpane/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/yeuxuan/mcpane/compare/v0.2.0...v0.2.1
