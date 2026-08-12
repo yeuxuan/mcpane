@@ -10,6 +10,14 @@ MCPane 每个版本改了什么、对你有什么影响，都记在这里。格�
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-08-12
+
+### 修复
+
+- 通过 Dock 或 Finder 启动 MCPane 时，依赖系统命令（如 `npx`）的 MCP 服务器可能长期停留在「启动中」，客户端页亦可能将已安装客户端误报为「未安装」。现已修正启动环境与安装探测逻辑，状态显示与实际安装、运行情况一致。
+- 下游 MCP 服务器重连失败时，不再错误中断仍可用的既有连接，避免工具列表在短暂重连失败后意外全部不可用。
+- 连接异常、云同步以及桌面端操作失败时，界面将返回明确错误原因，而不再以空状态或无反馈的加载中断结束，便于定位问题。
+
 ## [0.3.0] - 2026-08-08
 
 ### 新增
@@ -227,7 +235,8 @@ MCPane 是 Claude Code、Codex 与 MCP 工具的统一控制面，这一版包�
 - **安装包未经 Apple 公证**，首次打开会被系统拦下，需在
   「系统设置 → 隐私与安全性」中点「仍要打开」
 
-[Unreleased]: https://github.com/yeuxuan/mcpane/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/yeuxuan/mcpane/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/yeuxuan/mcpane/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/yeuxuan/mcpane/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/yeuxuan/mcpane/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/yeuxuan/mcpane/compare/v0.1.0...v0.2.0
