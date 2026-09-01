@@ -26,7 +26,7 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 ## 核心特性
 
 - **统一 MCP Hub**——各客户端共用同一本地聚合端点（`http://127.0.0.1:24860/mcp`），MCP Server 仅需配置一次；支持 stdio、Streamable HTTP、SSE 三种传输方式
-- **多客户端接入**——一键接入 Claude Code、Claude Desktop、Codex、Gemini CLI、Grok、OpenCode、OpenClaw、Hermes 八款客户端；按各客户端原生配置格式读写，注释、未知字段与键序完整保留
+- **多客户端接入**——一键接入 Claude Code、Codex、Claude Desktop、Cursor、VS Code、Cline、Devin、Gemini CLI，以及国内的 Trae、Qoder、Qwen Code、CodeBuddy、ZCode；按各客户端原生配置格式读写，注释、未知字段与键序完整保留。不在列的客户端可手动添加，同样发 Token、配访问控制
 - **供应商管理**——官方订阅与第三方中转分类管理、一键切换，支持配额查询与节点测速
 - **精细化控制**——按项目 / 工作区逐项启停 Server 与工具，支持工具别名；提供工具动态发现模式，避免大规模工具集占用模型上下文
 - **配置安全**——写入前自动快照、原子写入，任意一次变更可回滚；检测到外部改动时提醒，不静默覆盖
@@ -38,7 +38,7 @@ Server 仅需配置一次，全部客户端即刻共用；每一次配置写入�
 
 ![MCP 服务器页：逐项启停、工具计数与运行状态](screenshots/servers.png)
 
-![客户端页：八款客户端的检测与一键接入](screenshots/clients.png)
+![客户端页：各款 AI 编程客户端的检测与一键接入](screenshots/clients.png)
 
 </div>
 
