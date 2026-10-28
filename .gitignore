@@ -1,0 +1,57 @@
+# --- 通用 ---
+.DS_Store
+Thumbs.db
+*.log
+
+# --- 密钥与本地配置（禁止提交，见 AGENTS.md 执行总规则 8） ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.token
+**/secrets/
+
+# --- 用户本地数据（禁止提交） ---
+*.db
+*.db-wal
+*.db-shm
+mcpane.db*
+
+# --- Rust ---
+target/
+
+# --- Node / pnpm ---
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# --- Tauri ---
+apps/desktop/src-tauri/gen/
+# sidecar 二进制由构建生成（externalBin），可重建、平台相关，不入库
+apps/desktop/src-tauri/binaries/
+
+# --- 测试产物 ---
+playwright-report/
+test-results/
+
+# --- 编辑器 ---
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# --- Claude Code 本地运行时（勿提交） ---
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/scheduled_tasks.json
+.claude/worktrees/
+.claude/checkpoints/
+# 发版 skill 含本机发版流程细节，保留在本地，不入库
+.claude/skills/
+
+# --- Agent 会话与本地工具运行时（勿提交） ---
+.zcode/
+.video_agent/
+out/

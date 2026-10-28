@@ -1,0 +1,69 @@
+[package]
+name = "mcpane-hub"
+description = "MCP Hub - unified MCP aggregation endpoint"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "mcpane-devserver"
+path = "src/bin/mcpane_devserver.rs"
+
+[dependencies]
+mcpane-hub-catalog = { path = "../../crates/mcpane-hub-catalog" }
+mcpane-hub-downstream = { path = "../../crates/mcpane-hub-downstream" }
+mcpane-hub-protocol = { path = "../../crates/mcpane-hub-protocol" }
+mcpane-storage = { path = "../../crates/mcpane-storage" }
+rmcp = { workspace = true, features = [
+    "server",
+    "transport-streamable-http-server",
+    "transport-io",
+    # bridge 子命令：作为 MCP 客户端连回本机 Hub（stdio ↔ Streamable HTTP 转发）。
+    "client",
+    "transport-streamable-http-client-reqwest",
+    # MRTR 透传：requestState 由客户端原样回传，必须 HMAC 密封才能信（TASK-805）。
+    "request-state",
+    # 旧式 elicitation/create 桥接：Peer::create_elicitation 被该特性门控。
+    "elicitation",
+] }
+# requestState 密封密钥（每进程随机）。
+rand = { workspace = true }
+reqwest = { workspace = true }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+uuid = { workspace = true }
+sha2 = { workspace = true }
+subtle = { workspace = true }
+http = { workspace = true }
+mcpane-net = { path = "../../crates/mcpane-net" }
+
+# 控制面 Named Pipe 的安全描述符：默认 SD 会给 Everyone 与匿名账户读权限，
+# 必须显式收紧（见 control.rs）。
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_System_Threading",
+] }
+
+[dev-dependencies]
+futures = "0.3"
+tokio-util = { workspace = true }
+# chaos 测试：另开连接持 SQLite 写锁，验证 DB 锁竞争不拖垮数据面。
+sqlx = { workspace = true }
+http-body-util = "0.1"
+# OAuth 控制面端到端夹具（共用 mcpane-hub-downstream/tests/common/oauth_fake.rs）。
+base64 = "0.22"
+url = { workspace = true }
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

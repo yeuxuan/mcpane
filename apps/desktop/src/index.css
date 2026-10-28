@@ -1,0 +1,617 @@
+@import "tailwindcss";
+
+/* `dark:` 绑定到 data-theme，而非默认的 prefers-color-scheme——用户显式选的
+ * 浅色/深色必须压过系统偏好。语义 token 靠变量覆盖即可，此 variant 只服务于
+ * 少数直接用 Tailwind 调色板的地方，它们是**有意的例外**，不是漏改：
+ *   - 彩色图标胶囊（ui.tsx 的 IconChip / Tag tone）：一组并列的区分色，
+ *     语义 token 只有 danger/warn/run 三种含义，撑不起「第 5 个分类」。
+ *   - 品牌色块（BrandIcon / ProviderIcon 的官方 logo 色、Shell 的品牌标记）：
+ *     品牌色本就该恒定，跟着主题变反而是错的。
+ *   - 配置对比的增删着色（ConnectCompareModal）：红删绿增是 git 式通用约定，
+ *     换成 danger/run 会把「被删除的行」说成「出错了」，语义反而错位。
+ * 除此之外一律走语义 token——提示条的底色与描边尤其别再借原色，那套在暗色下
+ * 不跟着翻，会出现深棕底配浅黄边。 */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------ *
+ * MCPane 设计系统 — 安静的原生舞台，颜色交给内容
+ * MCPane 是后台的控制面，不该用自己的品牌色抢它所管理那些工具（Claude 橙、Gemini 蓝…）的戏：
+ *   - 外框纯中性，顶栏+侧栏比内容区深一档，框出工作面（macOS 窗口的层次）；
+ *   - 交互色取 macOS 系统蓝（压到 AA 可读），只做按钮/链接/选中/进度；
+ *   - 品牌绿（logo 亮着的那格）只表示「在线」：运行圆点、开关、已连接；
+ *   - 鲜艳感来自数据本身：第三方品牌 logo、余量计、图表、状态灯。
+ *
+ * 主题：@theme 为浅色基线，暗色在下方按 :root[data-theme="dark"] 覆盖
+ * 同名变量——组件一律用语义 token（bg-app / text-ink…），故换肤零改动。
+ * `data-theme` 恒为 light|dark 二选一，system 模式由 lib/theme.ts 解析后写入。
+ * ------------------------------------------------------------------ */
+@theme {
+  /* 表面 */
+  --color-app: #f6f6f7; /* 内容区底色 */
+  /* 外框：顶栏与侧栏，比内容区深一档，框住工作面。faint 在它上面只有 4.26:1，外框上的
+   * 次要文字一律用 muted。 */
+  --color-chrome: #ececee;
+  --color-card: #ffffff; /* 卡片 */
+  --color-hover: #efeff1; /* 悬停底 */
+  --color-line: #e3e3e6; /* 细分隔线 */
+  --color-line-strong: #d4d4d8;
+  /* 输入凹槽：卡片（白纸）上的填充式控件底。不能复用 --color-app——它是为
+   * "灰底托白卡"调的，落到白卡上只差 2% 明度，输入框会糊在纸面里看不出边界。
+   * 填充式取代描边式，是为了让并排的多个输入框不再用边框把版面切成网格。 */
+  --color-slot: #efeff2;
+
+  /* 文本层级（三级均在浅底 ≥ WCAG AA 4.5:1） */
+  --color-ink: #1d1d1f;
+  --color-muted: #56565c;
+  --color-faint: #6e6e73;
+
+  /* 系统蓝：macOS 的 #007aff 作白底小字只有 4.0:1，压到 #0064d2（5.4:1）；主按钮实底
+   * 取 #0a6ae0，白字 4.9:1。accent 作文本/描边/进度，accent-solid 作「实心底 + 字」。 */
+  --color-accent: #0064d2;
+  --color-accent-hover: #0054b0;
+  --color-accent-soft: #eaf2fd;
+  --color-accent-solid: #0a6ae0;
+  --color-accent-solid-hover: #0060cc;
+  --color-on-accent-solid: #ffffff;
+
+  /* 语义 */
+  /* green-700 而不是 green-600：#16a34a 在白卡上只有 3.30:1，「运行中」「已安装 v…」
+   * 这些小字一直不达 AA。此前扫不出来，是因为浏览器 E2E 没有 Tauri runtime，探测
+   * 全失败——状态徽标恒为灰色的 stop 分支，绿色那条路 axe 一次也没走过（守卫已补，
+   * 见 e2e/app.spec.ts 的在线态扫描）。#15803d 在白卡 5.01:1、灰底 4.65:1。 */
+  --color-run: #15803d; /* running 文本 */
+  --color-run-dot: #3fae5a; /* 在线圆点：logo 亮着的那一格 */
+  --color-on: #3fae5a; /* 开关开启：同一盏灯 */
+  --color-switch-off: #e2e2e6; /* iOS 开关关闭态轨道 */
+  --color-danger: #c81e1e;
+  --color-danger-soft: #fef2f2;
+  /* amber-700 而不是 amber-600：warn 文本要落在 warn-soft 暖底上（缺口提示条），
+   * #d97706 在 #fffbeb 上只有 3.4:1，连 app 灰底上也只有 3.6:1——一直不达 AA，
+   * 只是这一页此前没进 axe 扫描范围所以没暴露。#b45309 在三种底色上都 ≥ 5.4:1。 */
+  --color-warn: #b45309;
+  --color-warn-soft: #fffbeb;
+  /* 成功/运行态的软底。此前只有 run 文本色没有配套软底，「凭证已同步」这类
+   * 成功提示条只能去借 green-50，于是连边框、图标也一并跟着借了原色。 */
+  --color-run-soft: #f0fdf4;
+
+  /* 语义边框。soft 系列有底色却没有配套描边，三处提示条（ErrorBanner、一次性
+   * 令牌条、Claude Desktop 缺口条）只好用 rose-200/amber-200 兜底——暗色下
+   * soft 底翻成深棕，浅黄描边却纹丝不动，边框反倒比内容还抢眼。 */
+  --color-danger-line: #fecaca;
+  --color-warn-line: #fde68a;
+  --color-run-line: #bbf7d0;
+
+  /* 弹窗蒙层。与 --tour-scrim 同源思路：压暗的量在两套主题里不是一个值，
+   * 写死一个 slate-900/40 只在浅色下成立。 */
+  --color-scrim: rgb(15 23 42 / 0.4);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+
+  --shadow-card: 0 1px 2px rgba(17, 17, 26, 0.04), 0 1px 3px rgba(17, 17, 26, 0.05);
+  --shadow-pop: 0 4px 16px rgba(17, 17, 26, 0.08), 0 1px 3px rgba(17, 17, 26, 0.06);
+
+  /* ------------------------------------------------------------------ *
+   * shadcn/ui 语义色 → MCPane token 的映射层。
+   *
+   * shadcn 组件（components/shadcn/*）写死了 bg-background / border-input /
+   * ring-ring 这套类名。这里把它们指向上面已有的 token，而不是再维护一份
+   * 调色板——颜色仍然只有一个真源，暗色覆盖也自动跟着走（值是 var 引用）。
+   *
+   * 菜单/下拉的悬停高亮用中性 bg-hover + text-ink（不用 bg-accent 实底：满菜单泛蓝太吵），
+   * accent-foreground 仅作兜底。
+   * shadcn 的 muted 只用于 muted-foreground（无 bg-muted），与我们的文本级
+   * --color-muted 不冲突，无需改名。
+   * ------------------------------------------------------------------ */
+  --color-background: var(--color-app);
+  --color-foreground: var(--color-ink);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-card);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-accent-solid);
+  --color-primary-foreground: var(--color-on-accent-solid);
+  --color-secondary: var(--color-hover);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted-foreground: var(--color-faint);
+  --color-accent-foreground: #ffffff;
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-strong);
+  --color-ring: var(--color-accent);
+  --color-destructive: var(--color-danger);
+
+  /* Radix Accordion 的展开/收起：高度由 Radix 量出后写进 CSS 变量。 */
+  --animate-accordion-down: accordion-down 180ms ease-out;
+  --animate-accordion-up: accordion-up 160ms ease-out;
+
+  /* 配置编辑器语法色（JsonEditor 的 HighlightStyle 引用，随主题切换）。
+   * 底色是 --color-app，三级以上均 ≥ 4.5:1。 */
+  --cm-property: #0550ae;
+  --cm-string: #0a6640;
+  --cm-number: #8250df;
+  --cm-keyword: #b3246e;
+  --cm-comment: #6e6e78;
+  --cm-punct: #57575f;
+}
+
+/* ------------------------------------------------------------------ *
+ * 暗色调色板 — 取 macOS 系统暗色，仍是扁平实用风，不引入霓虹/发光。
+ * 只覆盖 @theme 的同名变量，utility 类名（bg-card / text-muted…）不变。
+ * 三级文本在各自底色上均 ≥ WCAG AA 4.5:1（faint 在 card 上约 5.1）。
+ * ------------------------------------------------------------------ */
+:root[data-theme="dark"] {
+  /* 表面：card 比 app 略亮，靠明度而非阴影拉开层次（暗色下阴影几乎不可见） */
+  --color-app: #1c1c1e;
+  --color-chrome: #161618;
+  --color-card: #262629;
+  --color-hover: #303034;
+  --color-line: #35353a;
+  --color-line-strong: #45454b;
+  /* 凹槽在暗色下反向：比卡片更暗才读作"陷进去"，跟浅色的更浅同理不同值。 */
+  --color-slot: #1a1a1c;
+
+  /* 文本层级 */
+  --color-ink: #f2f2f5;
+  --color-muted: #b4b4bb;
+  --color-faint: #9a9aa2;
+
+  /* 主色：macOS 的 #0a84ff 作文本只有 4.13:1（不达 AA），文本取更亮的 #409cff
+   * （on card 约 5.3），实心底另取深蓝保白字对比（约 5.6）。 */
+  --color-accent: #409cff;
+  --color-accent-hover: #66b0ff;
+  --color-accent-soft: #16273d;
+  --color-accent-solid: #0a63d6;
+  --color-accent-solid-hover: #0a6ae0;
+  --color-on-accent-solid: #ffffff;
+
+  /* 语义：soft 系列由浅色的近白底改为深色调，否则会在暗色界面上炸出白块 */
+  --color-run: #30d158;
+  --color-run-dot: #4cc46a;
+  --color-on: #45bf62;
+  --color-switch-off: #48484e;
+  /* 比 iOS systemRed dark (#ff453a) 提亮一档：原值在卡片底 #262629 上
+   * 对比度 4.43:1，差 WCAG AA（4.5）一线——axe 暗色扫描会挂。 */
+  --color-danger: #ff5a50;
+  --color-danger-soft: #2b1512;
+  --color-warn: #ff9f0a;
+  --color-warn-soft: #2b2011;
+  --color-run-soft: #12291a;
+
+  /* 描边取各自语义色的低透明度版而非另调实色：实色描边在暗底上会显出一圈硬边，
+   * 半透明才与 soft 底融为同一块面（浅色下 200 档实色是同样的道理，只是方向相反）。 */
+  --color-danger-line: rgb(255 90 80 / 0.25);
+  --color-warn-line: rgb(255 159 10 / 0.25);
+  --color-run-line: rgb(50 215 75 / 0.25);
+
+  /* 暗底上蒙层要压得更狠才分得出层次，同 --tour-scrim 的 0.66→0.72。 */
+  --color-scrim: rgb(0 0 0 / 0.6);
+
+  /* 阴影加重：浅色那套 4% 透明度的黑在暗底上等于没有 */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.36), 0 1px 3px rgba(0, 0, 0, 0.46);
+  --shadow-pop: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  /* 语法色：浅色那套是深色系，在暗底上对比度低到 1.3~2.0（近乎隐形），整套换成亮色系 */
+  --cm-property: #79c0ff;
+  --cm-string: #7ee787;
+  --cm-number: #d2a8ff;
+  --cm-keyword: #ff9bce;
+  --cm-comment: #9a9aa2;
+  --cm-punct: #b4b4bb;
+}
+
+@layer base {
+  /* Tailwind v4 起，不带颜色的 border-* 取 currentColor（会画出黑框）。
+   * shadcn 组件依赖"默认边框色"这一约定，这里把默认值定到分隔线色。 */
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-line);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    /* 桌面外壳没有"窗口级滚动"这回事：滚动一律发生在内容区内部。不锁死的话，
+     * 任何一处越界的绝对定位后代都会把 html 撑出一条滚动条，把外壳整个滚走。 */
+    overflow: hidden;
+  }
+
+  /* 让原生控件（表单、默认滚动条、拖拽反馈）跟随主题，否则暗色下会冒白件 */
+  :root {
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-app);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+
+  /* macOS 细滚动条（滑块色随主题走，暗色下浅灰滑块会很扎眼） */
+  :root {
+    --scrollbar-thumb: #cfcfd6;
+    --scrollbar-thumb-hover: #b6b6c0;
+  }
+  :root[data-theme="dark"] {
+    --scrollbar-thumb: #48484e;
+    --scrollbar-thumb-hover: #5a5a62;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+    background-clip: padding-box;
+  }
+
+  code,
+  pre,
+  kbd {
+    font-family: var(--font-mono);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 「特别推荐」烫金箔徽标 — 唯一一处允许的高光张扬处。
+ * 金属渐变 + 定期扫过的高光流光（布灵布灵）+ 金色柔光 + 压凸描边。
+ * 走评审印章质感，而非霓虹；prefers-reduced-motion 下高光自动静止。
+ * ------------------------------------------------------------------ */
+.recommend-badge {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  color: #6a4406;
+  background: linear-gradient(
+    135deg,
+    #f2b134 0%,
+    #ffd873 18%,
+    #fff7d6 40%,
+    #ffcf5c 58%,
+    #f6bd3e 80%,
+    #eba821 100%
+  );
+  border: 1px solid #f0c65a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 245, 0.9),
+    inset 0 -1px 1px rgba(190, 120, 20, 0.28),
+    0 1px 1px rgba(190, 120, 20, 0.18),
+    0 3px 11px rgba(250, 195, 75, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 252, 232, 0.7);
+}
+/* 扫过的高光：斜切光带，先扫一次再停顿，形成周期性一闪。 */
+.recommend-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 35%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.15) 65%,
+    transparent 100%
+  );
+  transform: translateX(-140%) skewX(-18deg);
+  animation: recommend-sheen 2.9s ease-in-out infinite;
+  pointer-events: none;
+}
+.recommend-badge__spark {
+  filter: drop-shadow(0 0 2px rgba(255, 249, 219, 0.9));
+}
+@keyframes recommend-sheen {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  32% {
+    transform: translateX(260%) skewX(-18deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * 进场动画（macOS sheet 式，只做进场）：
+ * 退场需要延迟卸载编排，复杂度高、macOS 上收益低，刻意不做。
+ * from-only keyframes：to 即元素自然状态，无需重复声明。
+ * prefers-reduced-motion 由下方全局规则兜底归零。
+ * ------------------------------------------------------------------ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+/* 弹窗蒙层：快速淡入，比面板短一拍——蒙层先立住，面板再浮上来。 */
+.modal-backdrop-in {
+  animation: fade-in 120ms ease-out;
+}
+/* 弹窗面板：轻微上浮 + 放大到位。 */
+.modal-panel-in {
+  animation: panel-in 160ms ease-out;
+}
+/* 页面切换：内容淡入（配合 key 重挂载触发）。 */
+.page-fade-in {
+  animation: fade-in 150ms ease-out;
+}
+/* 页内编辑面板（供应商编辑器）：与弹窗同一段位移语汇，但更短——它是同页导航，
+ * 不是"浮起一层"，动效过长会让人误以为发生了页面跳转。 */
+.editor-panel-in {
+  animation: panel-in 140ms ease-out;
+}
+
+/* ------------------------------------------------------------------ *
+ * 首启引导的聚光灯（见 components/OnboardingTour.tsx）。
+ *
+ * 遮罩是一张铺满视口的 SVG，洞挖在 mask 上。别改回"高亮框 + 铺满视口的超大
+ * box-shadow"那种写法：computed style 完全正确，WKWebView 却一片都不绘制，
+ * 在 Chromium 里测不出来，装成 app 才发现整屏没压暗。
+ *
+ * 洞与描边的位置由 JS 逐帧插值给出（见 useSlide），故这里不写位置过渡——
+ * 两者必须严丝合缝，共用一组坐标是唯一稳妥的对齐方式。
+ * ------------------------------------------------------------------ */
+:root {
+  /* 0.66 把白底压到 #616673 一档，洞里仍是原色 #f6f6f8——明度差约六成，
+   * 一眼就知道该看哪。取值贴着 product tour 的通行区间（0.6~0.75）。 */
+  --tour-scrim: rgb(15 23 42 / 0.66);
+  --tour-glow: rgb(37 99 235 / 0.28);
+  /* 光晕散尽处。必须与 --tour-glow 同色仅 alpha 归零：跨色插值会在中途泛灰。 */
+  --tour-glow-out: rgb(37 99 235 / 0);
+}
+:root[data-theme="dark"] {
+  /* 暗底不必再压那么狠，过头会整片糊死，反而看不出洞在哪。 */
+  --tour-scrim: rgb(0 0 0 / 0.72);
+  --tour-glow: rgb(64 156 255 / 0.3);
+  --tour-glow-out: rgb(64 156 255 / 0);
+}
+
+.tour-scrim {
+  animation: fade-in 200ms ease-out;
+}
+/* fill 不吃 presentation attribute 里的 var()，得走 CSS。 */
+.tour-scrim-fill {
+  fill: var(--tour-scrim);
+}
+
+/* 描边 + 光晕。扩散只有十来像素，WebKit 画得出来。
+ *
+ * 两段：落位时先打一下（光圈从外向内收紧，像灯真的照过来），之后才转入极轻的
+ * 常驻呼吸。只留呼吸的话，聚光灯看起来像个待机指示灯，换站也没有"命中"的那一下。
+ * 串联靠 delay 对齐 hit 的时长；ring 的 key 绑当前站，换站重挂即重播。 */
+.tour-ring {
+  border: 2px solid var(--color-accent);
+  animation:
+    tour-ring-hit 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    tour-ring-glow 3.2s ease-in-out 620ms infinite;
+}
+
+@keyframes tour-ring-hit {
+  from {
+    box-shadow: 0 0 0 16px var(--tour-glow-out);
+  }
+  to {
+    box-shadow: 0 0 0 5px var(--tour-glow);
+  }
+}
+
+@keyframes tour-ring-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 5px var(--tour-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 10px var(--tour-glow-out);
+  }
+}
+
+/* 气泡跟着聚光灯落位：短促上浮，比聚光灯的滑行快一拍，读起来是"跟过来"而非同时到。 */
+@keyframes tour-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.tour-bubble {
+  animation: tour-bubble-in 200ms ease-out;
+}
+/* 居中站用 transform 定位，位移动画会打架：那一站只淡入。 */
+.tour-bubble[style*="translate(-50%"] {
+  animation: fade-in 200ms ease-out;
+}
+
+/* 气泡内容逐行落位。整块上浮 + 逐行位移会双重晃动，所以父级负责位移、子级只
+ * 显现——层次出在时间上而非空间上。间隔递减（50→45→40→35→30），收尾更紧凑，
+ * 读起来是"落定"而不是"排队"。backwards 让延迟期间保持 from 帧，否则会先闪一下。 */
+@keyframes tour-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+.tour-bubble > .tour-line {
+  animation: tour-line-in 260ms ease-out backwards;
+}
+.tour-bubble > .tour-line:nth-child(2) {
+  animation-delay: 50ms;
+}
+.tour-bubble > .tour-line:nth-child(3) {
+  animation-delay: 95ms;
+}
+.tour-bubble > .tour-line:nth-child(4) {
+  animation-delay: 135ms;
+}
+.tour-bubble > .tour-line:nth-child(5) {
+  animation-delay: 170ms;
+}
+.tour-bubble > .tour-line:nth-child(6) {
+  animation-delay: 200ms;
+}
+
+/* ---- 开场的收束图 ---- */
+/* 骨架线。用 accent 压低透明度而不是中性灰：整张图因此是一套蓝的浓淡，"越靠近
+ * 中枢越实"本身就在说收束这件事。灰线试过，淡得几乎看不见，hero 反倒成了最轻的元素。 */
+.tour-dg-line {
+  stroke: var(--color-accent);
+  stroke-opacity: 0.36;
+  stroke-width: 1.75;
+}
+/* 沿线跑的光点。dash 的空档取得比路径略短，点跑完立刻从头进——留空档会看出断流。 */
+.tour-dg-flow path {
+  stroke: var(--color-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 3 170;
+  animation: tour-dg-flow 2.5s linear infinite;
+}
+@keyframes tour-dg-flow {
+  to {
+    stroke-dashoffset: -173;
+  }
+}
+
+/* 图上的端点。位置由内联 style 按百分比给出（与 DIAGRAM_PATHS 的 viewBox 坐标
+ * 对应），translate 把定位点挪到方块中心，好让线端正对着它。 */
+.tour-dg-chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 8px;
+  background: var(--color-card);
+}
+/* 中枢：两侧是"别人家的"，只有这个用实心主色 + MCPane 自己的标记。 */
+.tour-dg-hub {
+  width: 38px;
+  height: 38px;
+  border-color: transparent;
+  border-radius: 11px;
+  background: var(--color-accent-solid);
+  color: #fff;
+}
+
+/* ---- 收尾的三步清单 ---- */
+.tour-step-num {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 结果行："做完会怎样"。竖线把它与正文分开——它是承诺，不是补充说明。 */
+.tour-outcome {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+/* !important 必须有：Tailwind 工具类与 .page-fade-in 等类选择器（0,1,0）会压过
+ * 通配选择器（0,0,0）的归零声明——没有它这条规则对类声明的动画从未生效过。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: 通配归零必须压过类选择器动画 */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: 同上 */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: 同上 */
+    animation-iteration-count: 1 !important;
+  }
+  /* 入场动画整个移除而非仅归零：CSS 动画在挂载后、首帧前的 pending 阶段就会
+   * 应用 from 帧（opacity:0），归零时长仍留一个透明中间态——对 reduce 用户
+   * 和 axe 扫描都是噪声，none 才是"无动画"的如实表达。 */
+  .page-fade-in,
+  .modal-panel-in,
+  .editor-panel-in,
+  .modal-backdrop-in {
+    /* biome-ignore lint/complexity/noImportantStyles: 同上，压过入场动画类声明 */
+    animation: none !important;
+  }
+  /* 导览各处只需停掉动画：遮罩画在 SVG 里、描边是 border、内容行本来就在，都不
+   * 依赖动画存在，停了照样看得见（聚光灯的滑行本就由 JS 按 prefers-reduced-motion
+   * 跳过）。逐行入场尤其要显式停：通配规则只归零 duration 不动 delay，而它带
+   * backwards，延迟期间会一直停在 opacity:0——对 reduce 用户就是内容不见了。 */
+  .tour-bubble,
+  .tour-scrim,
+  .tour-ring,
+  .tour-bubble > .tour-line,
+  .tour-dg-flow path {
+    /* biome-ignore lint/complexity/noImportantStyles: 同上，压过入场/呼吸动画类声明 */
+    animation: none !important;
+  }
+}

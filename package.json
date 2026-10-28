@@ -1,0 +1,23 @@
+{
+  "name": "mcpane-monorepo",
+  "private": true,
+  "license": "MIT",
+  "packageManager": "pnpm@11.11.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node scripts/run-sh.mjs scripts/dev.sh",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "pnpm -r test",
+    "build": "pnpm --filter @mcpane/desktop build",
+    "e2e": "pnpm --filter @mcpane/desktop e2e",
+    "brand-scan": "node scripts/run-sh.mjs scripts/brand-scan.sh",
+    "clean:target": "node scripts/run-sh.mjs scripts/clean-target.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.8"
+  }
+}

@@ -1,0 +1,66 @@
+name: 缺陷报告
+description: 报告 MCPane 的功能异常或非预期行为
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: MCPane 版本
+      description: 见「设置 → 关于」，或安装包文件名中的版本号
+      placeholder: "例：0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 操作系统
+      options:
+        - macOS（Apple Silicon）
+        - macOS（Intel）
+        - Windows（x64）
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: 系统版本
+      placeholder: "例：macOS 15.5 / Windows 11 24H2"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 发生了什么？与预期有何不同？
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 尽量给出可稳定复现的操作序列
+      placeholder: |
+        1. 打开「客户端」页
+        2. 点击……
+        3. 出现……
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 截图与日志
+      description: >-
+        如涉及界面问题请附截图；如涉及请求异常，可在「日志」页筛选相关记录后截图或粘贴
+        （日志已脱敏，但粘贴前请自行确认不含敏感信息）
+  - type: dropdown
+    id: related-client
+    attributes:
+      label: 涉及的客户端（如有）
+      multiple: true
+      options:
+        - Claude Code
+        - Claude Desktop
+        - Codex
+        - Gemini CLI
+        - Grok
+        - OpenCode
+        - OpenClaw
+        - Hermes

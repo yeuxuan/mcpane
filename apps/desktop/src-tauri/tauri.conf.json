@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MCPane",
+  "version": "0.6.0",
+  "identifier": "io.mcpane.desktop",
+  "build": {
+    "beforeDevCommand": "pnpm build:sidecar && pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build:sidecar:release && pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "MCPane",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 640,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'sha256-va6snKZj183AAy4Q72bvtcvqENZyc77+36ENGGCaLKo='; style-src 'self' 'unsafe-inline'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "nsis", "appimage"],
+    "createUpdaterArtifacts": true,
+    "icon": ["icons/icon.png", "icons/icon.ico", "icons/icon.icns"],
+    "externalBin": ["binaries/mcpane-hub"],
+    "windows": {
+      "nsis": {
+        "installerHooks": "./windows/hooks.nsh"
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "12.0"
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": { "schemes": ["mcpane"] }
+    },
+    "updater": {
+      "endpoints": ["https://github.com/yeuxuan/mcpane/releases/latest/download/latest.json"],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEyQTI1QzE4RDVENTIyQkIKUldTN0l0WFZHRnlpRW9Bb2w2LzNyVFZOU1lSb2lkbkRQUzN3UGVyQmhtY21jKzZDdkQ0S2plYW8K"
+    }
+  }
+}

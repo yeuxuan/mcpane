@@ -1,0 +1,6 @@
+[totally_unknown_table]
+key = "value"
+
+[future_feature.sub]
+flag = true
+list = [1, 2, 3]

@@ -1,0 +1,6 @@
+# Codex 用户配置（顶部注释必须保留）
+model = "o3"  # 用户选择的模型
+
+[mcp_servers.context7]  # 已有 server
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]

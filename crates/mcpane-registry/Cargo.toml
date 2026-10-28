@@ -1,0 +1,20 @@
+[package]
+name = "mcpane-registry"
+description = "MCPane MCP 服务器发现 - 解析用户粘贴的地址，查询官方 MCP Registry，生成可预填的安装候选"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcpane-net = { path = "../mcpane-net" }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+url = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,25 @@
+# Codex 用户配置（真实风格 fixture）
+model = "gpt-5.2-codex"  # 用户手选
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[shell_environment_policy]
+inherit = "all"
+
+# 用户已有的 MCP server（必须原样保留）
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+startup_timeout_sec = 20
+
+[mcp_servers.playwright]
+url = "http://localhost:3131/mcp"
+# 这个注释也要保留
+
+[model_providers.my-proxy]
+name = "自定义代理"
+base_url = "https://proxy.example.com/v1"
+wire_api = "chat"
+
+[future_unknown_table.sub]
+anything = [1, 2, 3]

@@ -1,0 +1,223 @@
+name: Release
+
+# 只手动触发：发版半程分散在多台通道上（macOS 在开发机本地，Windows 与
+# Linux 在这里），tag 推送若自动开跑，会与手工重跑撞成对同一附件的重复上传。
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "要构建的已存在 tag（如 v0.1.0）"
+        required: true
+
+concurrency:
+  # 发布不设 cancel-in-progress：半途取消会留下只上传了部分产物的 Release，
+  # latest.json 里缺架构的用户会更新失败
+  group: release-${{ github.event.inputs.tag || github.ref }}
+
+# 分工（详见 docs/RELEASE_CHECKLIST.md）：
+#   - macOS 双架构在开发机本地构建上传（scripts/release-local.sh）——updater
+#     签名私钥本就只存在那台机器上，而 macOS runner 按 10 倍计费——双架构
+#     实测 19 + 13 分钟，放进 CI 一轮就是 ≈ 320 折算分钟；
+#   - Windows（2 倍）与 Linux（1 倍）默认走本 workflow，两个平台加起来
+#     ≈ 78 折算分钟（v0.4.0 实测：Windows 30.6 分钟、Linux 14.5 分钟）。
+#     省的不只是额度：Linux 半程原先要在 Windows 机器的
+#     WSL2 里备一整套工具链，
+#     ubuntu runner 上只是几行 apt。本地 release-local.sh 仍能出这两个
+#     平台，作 Actions 不可用时的兜底路径；
+#   - latest.json 由 publish-release.sh 在发布时按 Release 里实际存在的
+#     .sig 单写者重建并校验平台齐全，CI 不再设 finalize job——CI 侧无法
+#     预知本地 macOS 产物何时传齐，收口只能放在发布动作之前。
+
+jobs:
+  # 先把草稿 Release 建出来，构建 job 再按 releaseId 往里传；本地的
+  # release-local.sh 用同一套「按 tag_name 找到就复用」逻辑，两边谁先跑
+  # 都不会撞出重复草稿（tauri-action issue #914 的教训）。
+  create-release:
+    name: 建草稿 Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.draft.outputs.release_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: 校验版本号四处一致且与 tag 相符
+        env:
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          bash scripts/bump-version.sh
+          # 发布不可逆，这道检查在 CI 里已有一份，这里再兜一次
+          bash scripts/release-guard.sh
+          VERSION="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+            apps/desktop/src-tauri/tauri.conf.json | head -1)"
+          # tag 与 version 不符会让 latest.json 写上错的版本号，装完仍提示有更新
+          if [[ "$TAG" != "v$VERSION" ]]; then
+            echo "tag $TAG 与 tauri.conf.json 的 version $VERSION 对不上" >&2
+            echo "先跑 scripts/bump-version.sh ${TAG#v} 再打 tag" >&2
+            exit 1
+          fi
+          echo "版本校验通过: $TAG"
+
+      - name: 在本仓库建草稿 Release
+        id: draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Release Notes 唯一来源：CHANGELOG 按版本切片（脚本内含空条目校验）
+          bash scripts/changelog-notes.sh "${TAG#v}" > /tmp/notes.md
+
+          # 先验证 token 可用——失效时 API 返回错误对象；若不在此拦截，
+          # 错误 JSON 会被当成 releaseId 传下去，而 tauri-action 对非法 id
+          # 的行为是「静默跳过全部上传」且 job 照绿（v0.2.1 首发即此事故）
+          gh api "repos/$REPO" --jq .id >/dev/null \
+            || { echo "GITHUB_TOKEN 无法访问 $REPO（权限不足？需 contents: write）" >&2; exit 1; }
+
+          # 已存在就复用（workflow_dispatch 重跑、上一轮传到一半失败，
+          # 或本地 release-local.sh 已先建好）。
+          # 不与 head 连管道：管道会吞掉 gh 的退出码
+          LIST="$(gh api "repos/$REPO/releases" --paginate \
+            --jq ".[] | select(.tag_name==\"$TAG\") | .id")" \
+            || { echo "查询 Release 列表失败" >&2; exit 1; }
+          ID="$(head -1 <<<"$LIST")"
+
+          if [[ -n "$ID" ]]; then
+            echo "复用已存在的 Release $TAG (id=$ID)"
+          else
+            # 直接从创建响应里读 id，绝不「先建再回头列出找」：list 接口是最终
+            # 一致的，刚建好的草稿可能还不在返回里，那样会拿到空 id 直接失败
+            #（v0.2.0 首次发布就栽在这上面）。
+            # target_commitish=main：草稿 tag 落在 main 当前提交上
+            ID="$(jq -n \
+                  --arg tag "$TAG" \
+                  --arg name "MCPane $TAG" \
+                  --rawfile body /tmp/notes.md \
+                  '{tag_name:$tag, name:$name, body:$body,
+                    draft:true, prerelease:false, target_commitish:"main"}' \
+                | gh api "repos/$REPO/releases" --method POST \
+                    --input - --jq '.id')"
+            echo "已建草稿 Release $TAG (id=$ID)"
+          fi
+          # 必须是纯数字——任何别的形态都说明上游出了错，宁可红也不放行
+          [[ "$ID" =~ ^[0-9]+$ ]] || { echo "releaseId 非数字: '$ID'" >&2; exit 1; }
+          echo "release_id=$ID" >> "$GITHUB_OUTPUT"
+
+  release:
+    name: ${{ matrix.platform }}
+    needs: create-release
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Linux (x64)
+            target: x86_64-unknown-linux-gnu
+            # 钉死 24.04 不用 ubuntu-latest：AppImage 动态链接系统 glibc，
+            # 编译机的 glibc 版本就是用户侧的最低要求。跟着 latest 漂移的话，
+            # runner 镜像哪天升级，装不上的老发行版用户会静默变多。24.04 与
+            # 此前 WSL2 出包环境一致，不改变已发布版本的兼容基线。
+            os: ubuntu-24.04
+            # tauri.conf 的 targets 里 Linux 只有 appimage 适用，本可靠平台
+            # 过滤隐式收敛；显式限定是防御——将来往 targets 加了 deb/rpm，
+            # 它们会被 tauri-action 一起传进 Release，而那些没有 .sig、
+            # 也不在 latest.json 的平台清单里
+            extra_args: --bundles appimage
+            # 产物与 sidecar 的文件名后缀，Linux 上为空
+            bin_ext: ""
+          - platform: Windows (x64)
+            target: x86_64-pc-windows-msvc
+            os: windows-latest
+            # 这条通道已跑通多个版本，不加 --bundles 动它：conf 的 targets
+            # 在 Windows 上只有 nsis 适用，行为一样
+            extra_args: ""
+            bin_ext: ".exe"
+    runs-on: ${{ matrix.os }}
+    # 两个平台的构建都在 20–30 分钟量级，留足两倍余量。
+    timeout-minutes: 60
+    defaults:
+      run:
+        # Windows runner 默认 pwsh，这里的脚本步骤全是 bash 语法
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      # 清单取自 WSL2 出包环境实测跑通的那一份（比官方文档的最小集多几个）。
+      # WebKitGTK 是 Tauri 在 Linux 上的 webview，runner 不自带；xdg-utils
+      # 容易漏——缺它时 Rust 全部编译完、走到 AppImage 打包才报
+      # xdg-open not found，白等一轮。build-essential / pkg-config runner 预装。
+      # 不需要 libfuse2：Tauri 2 的 bundler 跑 linuxdeploy 时带
+      # APPIMAGE_EXTRACT_AND_RUN=1。
+      - name: 安装 Linux 构建依赖
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
+            librsvg2-dev patchelf libssl-dev xdg-utils desktop-file-utils
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.97.0
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          # 两个独立 workspace 都要缓存，漏掉 src-tauri 会让每次发布重编整棵
+          # Tauri 依赖树
+          workspaces: |
+            .
+            apps/desktop/src-tauri
+          key: ${{ matrix.target }}
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # 版本号与 release-guard 的校验在 create-release 里做过了，它是本 job 的
+      # 前置门（needs），不通过这里根本不会启动，无需重复一遍
+
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          # 单仓发布：GITHUB_TOKEN + 上方 permissions 的 contents: write
+          # 即可在本仓库建 Release、传附件
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 更新包签名（minisign），与 Apple 签名无关：它保证下发的更新包没被
+          # 掉包。私钥丢失即无法再为老用户签任何更新，见 docs/RELEASE_CHECKLIST.md
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          projectPath: apps/desktop
+          # 附件传进本仓库那个已经建好的草稿 Release——不给 tagName，
+          # 由 releaseId 直接定位，本 job 不参与任何「找不到就创建」的逻辑
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          # 本 job 一概不碰 latest.json：它由 publish-release.sh 在发布前
+          # 按实际 .sig 单写者重建（tauri-action 自己写会与本地上传的 macOS
+          # 产物竞态，issue #1270 的无锁读-改-写问题依旧）。
+          # .sig 文件本身照常上传（uploadUpdaterSignatures 默认 true）。
+          uploadUpdaterJson: false
+          args: --target ${{ matrix.target }} ${{ matrix.extra_args }}
+
+      # tauri-action 内部按 --target 编译，desktop 主程序与 beforeBuildCommand
+      # 里的 hub sidecar 各自独立编译同一份 mcpane-storage——build.rs 已经在
+      # 源头堵住"只加迁移文件不触发重编译"的坑，这里发布前再复核一遍两个
+      # 二进制真的都含最新迁移（scripts/verify-embedded-migrations.sh 头注释
+      # 有完整背景）。此刻附件已经传进草稿 Release，这一步失败会让本 job 标红，
+      # 卡住后续 publish-release.sh 的 CI 绿门，不会让坏产物流到正式发布。
+      - name: 校验两个二进制都含最新迁移
+        run: |
+          bash scripts/verify-embedded-migrations.sh \
+            "apps/desktop/src-tauri/target/${{ matrix.target }}/release/mcpane${{ matrix.bin_ext }}" \
+            "apps/desktop/src-tauri/binaries/mcpane-hub-${{ matrix.target }}${{ matrix.bin_ext }}"

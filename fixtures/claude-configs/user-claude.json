@@ -1,0 +1,26 @@
+{
+  "installMethod": "npm",
+  "autoUpdates": true,
+  "tipsHistory": { "new-user-warmup": 1 },
+  "numStartups": 42,
+  "theme": "dark",
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": { "USER_KEY": "keep-me" }
+    }
+  },
+  "projects": {
+    "/Users/example/work/repo": {
+      "allowedTools": ["Bash"],
+      "mcpServers": {
+        "local-only": { "type": "stdio", "command": "./run.sh" }
+      },
+      "hasTrustDialogAccepted": true
+    }
+  },
+  "oauthAccount": { "accountUuid": "00000000-0000-0000-0000-000000000000" },
+  "futureUnknownField": { "keep": ["everything", 1, true] }
+}

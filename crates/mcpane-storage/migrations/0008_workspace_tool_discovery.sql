@@ -1,0 +1,11 @@
+-- Workspace 级工具动态发现开关（Tool Discovery 模式）：开启后 Hub 的
+-- tools/list 只暴露 mcpane__tool_discovery / mcpane__tool_execute 两个
+-- meta 工具，客户端按需检索，避免大量工具撑爆模型上下文。
+--
+-- workspaces 表无 CHECK 约束，直接 ADD COLUMN 即可（对比 0005/0007 因
+-- CHECK 才被迫重建）。
+--
+-- 默认工作区（ws_default）在库里没有真实行（它是 hub 侧常量）：其开关
+-- 通过按需 UPSERT 一条 id='ws_default' 的「幽灵行」承载，list 查询会
+-- 排除该行，不影响前端的自建工作区列表语义。
+ALTER TABLE workspaces ADD COLUMN tool_discovery INTEGER NOT NULL DEFAULT 0;

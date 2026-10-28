@@ -1,0 +1,91 @@
+# Desktop 可执行标识冻结为 `mcpane`（docs/branding/NAMING.md）。
+# 独立于根 Cargo workspace：桌面壳由 `pnpm tauri dev/build` 驱动，
+# 根 workspace 的 fmt/clippy/test 保持聚焦 Hub 与领域 crates。
+[package]
+name = "mcpane"
+version = "0.6.0"
+description = "MCPane desktop shell"
+license = "MIT"
+repository = "https://github.com/yeuxuan/mcpane"
+edition = "2024"
+rust-version = "1.97.0"
+
+[workspace]
+
+# 控制构建产物体积（Tauri 依赖树庞大，debuginfo 是体积大头）。
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+# 发布体积优化，与根 workspace 对齐（见根 Cargo.toml 注释；
+# 同样不设 panic = "abort"，保住 Tauri/webview 回调里的 unwind 语义）。
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.5", features = ["tray-icon"] }
+tauri-plugin-window-state = "2.4"
+tauri-plugin-shell = "2"
+# 单实例：挡的是 providers.json 的跨进程 load-modify-save（PROVIDER_MUTEX 只防
+# 进程内）。挡的不是 Hub 端口——hub_process 的探活会 adopt 已在跑的实例，不会抢。
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-deep-link = "~2.4.10"
+# 解析 OAuth 回调的查询串（tauri 依赖树里本就有，不新增编译产物）。
+url = "2"
+serde = { version = "1", features = ["derive"] }
+# preserve_order 与根 workspace 对齐：编辑器展示/配置写回保留用户键序。
+serde_json = { version = "1", features = ["preserve_order"] }
+tokio = { version = "1.53", features = ["net", "io-util", "time", "rt", "sync", "signal"] }
+mcpane-adapter-claude = { path = "../../../crates/mcpane-adapter-claude" }
+mcpane-adapter-codex = { path = "../../../crates/mcpane-adapter-codex" }
+mcpane-adapter-gemini = { path = "../../../crates/mcpane-adapter-gemini" }
+mcpane-adapter-grok = { path = "../../../crates/mcpane-adapter-grok" }
+mcpane-adapter-hermes = { path = "../../../crates/mcpane-adapter-hermes" }
+mcpane-adapter-openclaw = { path = "../../../crates/mcpane-adapter-openclaw" }
+mcpane-adapter-opencode = { path = "../../../crates/mcpane-adapter-opencode" }
+mcpane-ccswitch = { path = "../../../crates/mcpane-ccswitch" }
+mcpane-config = { path = "../../../crates/mcpane-config" }
+mcpane-desktop-proxy = { path = "../../../crates/mcpane-desktop-proxy" }
+mcpane-hub-protocol = { path = "../../../crates/mcpane-hub-protocol" }
+mcpane-net = { path = "../../../crates/mcpane-net" }
+mcpane-registry = { path = "../../../crates/mcpane-registry" }
+mcpane-provider = { path = "../../../crates/mcpane-provider" }
+mcpane-secrets = { path = "../../../crates/mcpane-secrets" }
+mcpane-storage = { path = "../../../crates/mcpane-storage" }
+mcpane-sync = { path = "../../../crates/mcpane-sync" }
+mcpane-usage = { path = "../../../crates/mcpane-usage" }
+tauri-plugin-opener = "2"
+# 自动更新（TASK-703 子项）：检查/下载/安装走 Rust 侧命令，前端零新依赖。
+# 关掉默认的 zip feature：它只解 Windows .zip / Linux .tar.gz 更新包，我们发的是
+# setup.exe 与裸 AppImage（macOS 的 tar 解包不受它门控）；留着会拖进 zip 4.x 的
+# RUSTSEC-2026-0367/0368/0369，修复版 9.x 插件尚未跟进。
+tauri-plugin-updater = { version = "2", default-features = false, features = ["rustls-tls"] }
+tauri-plugin-autostart = "2.5.1"
+
+# envsync：Windows 用户环境变量走 HKCU\Environment 直写 + WM_SETTINGCHANGE 广播。
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_WindowsAndMessaging", "Win32_System_Threading"] }
+
+# macOS：dev 裸二进制从托盘恢复后重设 Dock 图标（见 main.rs reapply_dock_icon）。
+# 版本与 feature 对齐 tauri 2.11.5 自身的声明，全部命中锁文件既有版本，不新增编译单元。
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSResponder", "NSImage"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSData"] }
+
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+unwrap_used = "deny"
+# 对齐根 workspace（独立 workspace 不吃 workspace.lints，要手抄一份）。
+expect_used = "warn"

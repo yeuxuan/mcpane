@@ -1,0 +1,28 @@
+[package]
+name = "mcpane-sync"
+description = "MCPane 数据云同步（WebDAV / S3 兼容），全量快照协议"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcpane-config = { path = "../mcpane-config" }
+mcpane-net = { path = "../mcpane-net" }
+mcpane-storage = { path = "../mcpane-storage" }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+hmac = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+sqlx = { workspace = true }
+axum = { workspace = true }
+
+[lints]
+workspace = true

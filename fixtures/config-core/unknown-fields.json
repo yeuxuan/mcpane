@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "existing": { "type": "stdio", "command": "npx" }
+  },
+  "unknownTopLevel": { "nested": [1, 2, {"deep": true}], "s": "keep-me" },
+  "$schema": "https://example.com/schema.json",
+  "numberField": 42.5
+}

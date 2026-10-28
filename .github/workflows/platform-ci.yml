@@ -1,0 +1,85 @@
+name: Platform CI
+
+# Windows（2 倍计费）专属分支的验证。从每次 push 的 CI 里拆出来，只在发版前
+# dispatch 一次（release-tag.sh 预检硬卡本 workflow 绿）。
+#
+# 为什么只有 Windows：三个平台里它是唯一没人编过的那一面——cfg(windows) 的
+# 分支在开发机上根本不参与编译。Linux 由 ci.yml 的 ubuntu job 每推一次都覆盖；
+# macOS 分支在开发机的日常 cargo test 里天天在编，再按 10 倍计费跑一遍是纯
+# 重复，发版前若要正式凭据，用本机的
+# .claude/skills/mcpane-release/scripts/preflight.sh。
+#
+# 为什么没有定时巡检：本仓的发版频率（2026-07~08 平均 3-4 天一版）本就高于
+# 任何合理的巡检周期，发版前那次 dispatch 已经把窗口盖住，再加一条每周 cron
+# 是纯重复消耗（≈208 折算分钟/月）。真遇上长期不发版，代价是发版预检那次红
+# 一片、修完慢一轮——预检卡在 tag 之前，坏代码出不去，不构成事故。
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: platform-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Rust (windows)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.97.0
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --check
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      # --no-fail-fast：默认一个测试二进制挂了就不再跑后面的，跨平台问题会变成
+      # 一轮 CI 只暴露一个、修一个再等一轮。全跑完才能一次看全。
+      - run: cargo test --workspace --all-features --no-fail-fast
+
+      # src-tauri 自带 [workspace]，上面的 --workspace 覆盖不到它——桌面壳的
+      # 全部 Tauri command、hub_process、envsync 若不在这里 lint/test，唯一
+      # 编译时机就是发布时的 tauri build，而那既不跑测试也不可逆。
+      - name: 准备 sidecar 占位
+        # build.rs 校验 externalBin 存在才放行；lint/test 不需要真二进制。
+        # 已存在就不动——同样的命令开发者可能在本机跑，`: >` 会截断真实产物。
+        shell: bash
+        working-directory: apps/desktop/src-tauri
+        run: |
+          triple=$(rustc -vV | sed -n 's/^host: //p')
+          ext=""
+          case "$triple" in *windows*) ext=".exe" ;; esac
+          mkdir -p binaries
+          target="binaries/mcpane-hub-${triple}${ext}"
+          [ -f "$target" ] || : > "$target"
+      # 拆成三步而非一个多行 run：windows runner 默认 shell 是 pwsh，多行 run 里
+      # 前面的命令失败不会中断，只有最后一行的退出码决定 step 成败——fmt 和
+      # clippy 的失败会被静默吞掉。
+      - name: src-tauri fmt
+        working-directory: apps/desktop/src-tauri
+        run: cargo fmt --check
+      - name: src-tauri clippy
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: src-tauri test
+        working-directory: apps/desktop/src-tauri
+        run: cargo test --all-features --no-fail-fast
+
+  frontend:
+    name: Frontend (windows)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # typecheck/lint/vitest/build 每推都在 ubuntu CI 跑过；这里只验证真的
+      # 与平台相关的两步：vitest 跑在 Windows 的 Node 上，vite build 的产物
+      # 路径与行尾在 Windows 上咬过人。
+      - run: pnpm test
+      - run: pnpm build

@@ -1,0 +1,19 @@
+[package]
+name = "mcpane-usage"
+description = "MCPane 用量解析 - 从 Claude/Codex 本地会话文件抽取 token 用量（无 DB 依赖，纯函数）"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde_json = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

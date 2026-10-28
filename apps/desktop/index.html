@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCPane</title>
+    <!-- 首帧前定主题：模块脚本晚于首次绘制，暗色用户会先看到一帧浅底。
+         与 src/lib/theme.ts 读同一个键，system 在此按系统偏好解析。 -->
+    <script>
+      (() => {
+        let theme = null;
+        try {
+          theme = localStorage.getItem("mcpane:theme");
+        } catch (_) {}
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

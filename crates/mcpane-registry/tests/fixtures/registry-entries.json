@@ -1,0 +1,566 @@
+{
+ "ai.smithery/arjunkmrm-fetch": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2025-10-08T02:32:40.481877Z",
+    "status": "active",
+    "statusChangedAt": "2025-10-08T02:32:40.481877Z",
+    "updatedAt": "2025-10-08T02:32:40.481877Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-16/server.schema.json",
+   "description": "Fetch web pages and extract exactly the content you need. Select elements with CSS and retrieve co…",
+   "name": "ai.smithery/arjunkmrm-fetch",
+   "remotes": [
+    {
+     "headers": [
+      {
+       "description": "Bearer token for Smithery authentication",
+       "name": "Authorization",
+       "value": "Bearer {smithery_api_key}"
+      }
+     ],
+     "type": "streamable-http",
+     "url": "https://server.smithery.ai/@arjunkmrm/fetch/mcp"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/arjunkmrm/fetch"
+   },
+   "version": "1.0.0"
+  }
+ },
+ "com.mcparmory/sentry": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-05-12T12:49:09.609234Z",
+    "status": "active",
+    "statusChangedAt": "2026-05-12T12:49:09.609234Z",
+    "updatedAt": "2026-05-12T12:49:09.609234Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Track errors, manage performance alerts, and configure dashboards and monitors",
+   "name": "com.mcparmory/sentry",
+   "packages": [
+    {
+     "identifier": "mcparmory-sentry",
+     "registryType": "pypi",
+     "runtimeHint": "uvx",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "1.0.2"
+    },
+    {
+     "identifier": "ghcr.io/mcparmory/sentry:1.0.2",
+     "registryType": "oci",
+     "runtimeHint": "docker",
+     "transport": {
+      "type": "stdio"
+     }
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/mcparmory/registry"
+   },
+   "version": "1.0.2"
+  }
+ },
+ "com.notion/mcp": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2025-09-11T22:25:50.737872Z",
+    "status": "active",
+    "statusChangedAt": "2025-09-11T22:25:50.737872Z",
+    "updatedAt": "2025-09-11T22:25:50.737872Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+   "description": "Official Notion MCP server",
+   "name": "com.notion/mcp",
+   "remotes": [
+    {
+     "type": "streamable-http",
+     "url": "https://mcp.notion.com/mcp"
+    },
+    {
+     "type": "sse",
+     "url": "https://mcp.notion.com/sse"
+    }
+   ],
+   "repository": {},
+   "version": "1.0.1"
+  }
+ },
+ "io.github.Jackxiaozhiren/datasentry": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-08-29T09:07:48.777511Z",
+    "status": "active",
+    "statusChangedAt": "2026-08-29T09:07:48.777511Z",
+    "updatedAt": "2026-08-29T09:07:48.777511Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Local-first MCP server for data-quality discovery, evidence, drift, and controlled repair.",
+   "name": "io.github.Jackxiaozhiren/datasentry",
+   "packages": [
+    {
+     "identifier": "datasentry-ai",
+     "packageArguments": [
+      {
+       "type": "positional",
+       "value": "datasentry"
+      },
+      {
+       "type": "positional",
+       "value": "mcp"
+      }
+     ],
+     "registryBaseUrl": "https://pypi.org",
+     "registryType": "pypi",
+     "runtimeArguments": [
+      {
+       "name": "--from",
+       "type": "named",
+       "value": "datasentry-ai==1.0.4"
+      }
+     ],
+     "runtimeHint": "uvx",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "1.0.4"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/Jackxiaozhiren/datasentry"
+   },
+   "title": "DataSentry",
+   "version": "1.0.4",
+   "websiteUrl": "https://jackxiaozhiren.github.io/datasentry/"
+  }
+ },
+ "io.github.adelaidasofia/linear-mcp": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-05-24T15:01:25.946011Z",
+    "status": "active",
+    "statusChangedAt": "2026-05-24T15:01:25.946011Z",
+    "updatedAt": "2026-05-24T15:01:25.946011Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Multi-workspace Linear MCP — PAT auth, 57 tools + 3 prompts, substrate enforcement, drop-in.",
+   "name": "io.github.adelaidasofia/linear-mcp",
+   "packages": [
+    {
+     "environmentVariables": [
+      {
+       "description": "Personal API Key from linear.app/settings/account/security",
+       "isRequired": true,
+       "isSecret": true,
+       "name": "LINEAR_PAT"
+      }
+     ],
+     "identifier": "adelaidasofia-linear-mcp",
+     "registryType": "pypi",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "0.3.2"
+    },
+    {
+     "environmentVariables": [
+      {
+       "description": "Personal API Key from linear.app/settings/account/security",
+       "isRequired": true,
+       "isSecret": true,
+       "name": "LINEAR_PAT"
+      }
+     ],
+     "fileSha256": "bd6c92b5ecb35a585679d43f2b2259e4ee03fa6d6f6e3eb6b54eed17289db372",
+     "identifier": "https://github.com/adelaidasofia/linear-mcp/releases/download/v0.3.2/linear-mcp.mcpb",
+     "registryType": "mcpb",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "0.3.2"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/adelaidasofia/linear-mcp"
+   },
+   "title": "Linear MCP (multi-workspace, PAT auth)",
+   "version": "0.3.2"
+  }
+ },
+ "io.github.bytedance/mcp-server-filesystem": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2025-09-09T06:16:36.369748Z",
+    "status": "active",
+    "statusChangedAt": "2025-09-09T06:16:36.369748Z",
+    "updatedAt": "2025-09-09T06:16:36.369748Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+   "description": "MCP server for filesystem access",
+   "name": "io.github.bytedance/mcp-server-filesystem",
+   "packages": [
+    {
+     "identifier": "@agent-infra/mcp-server-filesystem",
+     "packageArguments": [
+      {
+       "description": "Comma-separated list of allowed directories for file operations",
+       "format": "string",
+       "isRequired": true,
+       "name": "allowed-directories",
+       "type": "named"
+      }
+     ],
+     "registryBaseUrl": "https://registry.npmjs.org",
+     "registryType": "npm",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "latest"
+    },
+    {
+     "identifier": "@agent-infra/mcp-server-filesystem",
+     "packageArguments": [
+      {
+       "description": "Comma-separated list of allowed directories for file operations",
+       "format": "string",
+       "isRequired": true,
+       "name": "allowed-directories",
+       "type": "named"
+      },
+      {
+       "default": "8089",
+       "description": "Server port number",
+       "format": "number",
+       "isRequired": true,
+       "name": "port",
+       "type": "named"
+      }
+     ],
+     "registryBaseUrl": "https://registry.npmjs.org",
+     "registryType": "npm",
+     "runtimeHint": "npx",
+     "transport": {
+      "type": "sse",
+      "url": "http://127.0.0.1:{port}/sse"
+     },
+     "version": "latest"
+    },
+    {
+     "identifier": "@agent-infra/mcp-server-filesystem",
+     "packageArguments": [
+      {
+       "description": "Comma-separated list of allowed directories for file operations",
+       "format": "string",
+       "isRequired": true,
+       "name": "allowed-directories",
+       "type": "named"
+      },
+      {
+       "default": "8089",
+       "description": "Server port number",
+       "format": "number",
+       "isRequired": true,
+       "name": "port",
+       "type": "named"
+      }
+     ],
+     "registryBaseUrl": "https://registry.npmjs.org",
+     "registryType": "npm",
+     "runtimeHint": "npx",
+     "transport": {
+      "type": "streamable-http",
+      "url": "http://127.0.0.1:{port}/mcp"
+     },
+     "version": "latest"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "subfolder": "packages/agent-infra/mcp-servers/filesystem",
+    "url": "https://github.com/bytedance/UI-TARS-desktop"
+   },
+   "version": "1.0.0"
+  }
+ },
+ "io.github.fieldcure/filesystem": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-05-25T09:23:37.340888Z",
+    "status": "active",
+    "statusChangedAt": "2026-05-25T09:23:37.340888Z",
+    "updatedAt": "2026-05-25T09:23:37.340888Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Secure MCP server for sandboxed filesystem operations with document parsing support.",
+   "name": "io.github.fieldcure/filesystem",
+   "packages": [
+    {
+     "identifier": "FieldCure.Mcp.Filesystem",
+     "registryBaseUrl": "https://api.nuget.org/v3/index.json",
+     "registryType": "nuget",
+     "runtimeHint": "dnx",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "1.1.2"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/fieldcure/fieldcure-mcp-filesystem"
+   },
+   "version": "1.1.2"
+  }
+ },
+ "io.github.j0hanz/filesystem-mcp": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-10-02T20:04:31.209089Z",
+    "status": "active",
+    "statusChangedAt": "2026-10-02T20:04:31.209089Z",
+    "updatedAt": "2026-10-02T20:04:31.209089Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Secure filesystem MCP server for reading, writing, searching, diffing, and patching files.",
+   "name": "io.github.j0hanz/filesystem-mcp",
+   "packages": [
+    {
+     "environmentVariables": [
+      {
+       "description": "Allowed directories; ':'-separated on Unix, ';'-separated on Windows. Alternative to positional arguments.",
+       "format": "string",
+       "name": "FS_ALLOWED_DIRS"
+      }
+     ],
+     "identifier": "@j0hanz/filesystem-mcp",
+     "packageArguments": [
+      {
+       "description": "Directory path the server is allowed to access. Repeat for multiple directories.",
+       "format": "filepath",
+       "isRepeated": true,
+       "type": "positional",
+       "valueHint": "allowed_directory"
+      },
+      {
+       "description": "Allow the current working directory as an additional access root.",
+       "format": "boolean",
+       "name": "--allow-cwd",
+       "type": "named"
+      },
+      {
+       "description": "Disable all write, edit, move, and delete tools.",
+       "format": "boolean",
+       "name": "--read-only",
+       "type": "named"
+      }
+     ],
+     "registryType": "npm",
+     "runtimeHint": "npx",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "2.7.1"
+    },
+    {
+     "environmentVariables": [
+      {
+       "description": "Allowed directories inside the container, ':'-separated. Alternative to positional arguments.",
+       "format": "string",
+       "name": "FS_ALLOWED_DIRS"
+      }
+     ],
+     "identifier": "ghcr.io/j0hanz/filesystem-mcp:2.7.1",
+     "packageArguments": [
+      {
+       "default": "/workspace",
+       "description": "Container path of the mounted directory.",
+       "isRequired": true,
+       "type": "positional",
+       "valueHint": "/workspace"
+      }
+     ],
+     "registryType": "oci",
+     "runtimeArguments": [
+      {
+       "description": "Keep stdin open for stdio transport.",
+       "format": "boolean",
+       "isRequired": true,
+       "name": "-i",
+       "type": "named"
+      },
+      {
+       "description": "Remove the container on exit.",
+       "format": "boolean",
+       "isRequired": true,
+       "name": "--rm",
+       "type": "named"
+      },
+      {
+       "description": "Mount the directory to expose to the server.",
+       "isRepeated": true,
+       "isRequired": true,
+       "name": "-v",
+       "type": "named",
+       "value": "{host_dir}:/workspace:ro",
+       "variables": {
+        "host_dir": {
+         "description": "Host directory path to expose to the server.",
+         "format": "filepath",
+         "isRequired": true
+        }
+       }
+      }
+     ],
+     "runtimeHint": "docker",
+     "transport": {
+      "type": "stdio"
+     }
+    }
+   ],
+   "repository": {
+    "id": "1115057681",
+    "source": "github",
+    "url": "https://github.com/j0hanz/filesystem-mcp"
+   },
+   "title": "Filesystem MCP",
+   "version": "2.7.1",
+   "websiteUrl": "https://github.com/j0hanz/filesystem-mcp"
+  }
+ },
+ "io.github.rghsoftware/linux-filesystem": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2025-10-26T04:07:30.533036Z",
+    "status": "active",
+    "statusChangedAt": "2025-10-26T04:07:30.533036Z",
+    "updatedAt": "2025-10-26T04:07:30.533036Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+   "description": "Enhanced Linux filesystem access with symlinks, permissions, and chmod support",
+   "name": "io.github.rghsoftware/linux-filesystem",
+   "packages": [
+    {
+     "fileSha256": "3174a623da8d3da7013467bb877dde5591a8f6e04dad0430b2784303ecbfedfe",
+     "identifier": "https://github.com/rghsoftware/linux-filesystem-extension/releases/download/v1.2.1/linux-filesystem.mcpb",
+     "registryType": "mcpb",
+     "transport": {
+      "type": "stdio"
+     }
+    }
+   ],
+   "repository": {},
+   "title": "Linux Filesystem",
+   "version": "1.2.1"
+  }
+ },
+ "io.github.upstash/context7": {
+  "_meta": {
+   "io.modelcontextprotocol.registry/official": {
+    "isLatest": true,
+    "publishedAt": "2026-09-14T14:53:08.392156Z",
+    "status": "active",
+    "statusChangedAt": "2026-09-14T14:53:08.392156Z",
+    "updatedAt": "2026-09-14T14:53:08.392156Z"
+   }
+  },
+  "server": {
+   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+   "description": "Up-to-date code docs for any prompt",
+   "icons": [
+    {
+     "mimeType": "image/png",
+     "src": "https://raw.githubusercontent.com/upstash/context7/master/public/icon.png"
+    }
+   ],
+   "name": "io.github.upstash/context7",
+   "packages": [
+    {
+     "environmentVariables": [
+      {
+       "description": "API key for authentication",
+       "isSecret": true,
+       "name": "CONTEXT7_API_KEY"
+      }
+     ],
+     "identifier": "@upstash/context7-mcp",
+     "registryType": "npm",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "4.1.1"
+    },
+    {
+     "environmentVariables": [
+      {
+       "description": "API key for authentication",
+       "isSecret": true,
+       "name": "CONTEXT7_API_KEY"
+      }
+     ],
+     "fileSha256": "887f32c140ca9fa85a0363191f5ee7a443dac17649aaf1f96cdf505e4dc9d26f",
+     "identifier": "https://github.com/upstash/context7/releases/download/mcpb-v4.1.1/context7.mcpb",
+     "registryType": "mcpb",
+     "transport": {
+      "type": "stdio"
+     },
+     "version": "4.1.1"
+    }
+   ],
+   "remotes": [
+    {
+     "headers": [
+      {
+       "description": "API key for authentication. Accepts \"Bearer <key>\" or the raw key.",
+       "isSecret": true,
+       "name": "Authorization"
+      }
+     ],
+     "type": "streamable-http",
+     "url": "https://mcp.context7.com/mcp"
+    }
+   ],
+   "repository": {
+    "source": "github",
+    "url": "https://github.com/upstash/context7"
+   },
+   "title": "Context7",
+   "version": "4.1.1",
+   "websiteUrl": "https://context7.com"
+  }
+ }
+}

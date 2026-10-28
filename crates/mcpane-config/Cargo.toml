@@ -1,0 +1,37 @@
+[package]
+name = "mcpane-config"
+description = "MCPane config safety engine - minimal patch, atomic write, snapshot, rollback"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml_edit = { workspace = true }
+json-five = "0.3.1"
+serde_yaml_ng = "0.10"
+sha2 = { workspace = true }
+similar = { workspace = true }
+notify = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+tracing = { workspace = true }
+
+# 凭据文件的 DACL 收紧（permissions.rs）与子进程输出的代码页解码
+# （process_output.rs）——两处都只能走 Win32 FFI。
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+] }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

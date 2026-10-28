@@ -1,0 +1,31 @@
+[package]
+name = "mcpane-desktop-proxy"
+description = "MCPane local router - Claude Code/Codex failover routing and Claude Desktop gateway"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcpane-net = { path = "../mcpane-net" }
+mcpane-provider = { path = "../mcpane-provider" }
+axum = { workspace = true }
+# "stream"：SSE 直通需要 reqwest 的 bytes_stream。
+reqwest = { workspace = true, features = ["stream"] }
+# 空闲看门 Stream adapter 只需 trait 本体，不引 futures 全家桶。
+futures-core = "0.3"
+# 协议转换流（unfold / flatten）；用 futures-util 而非 futures 全家桶。
+futures-util = "0.3"
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+futures = "0.3"
+# 看门计时器测试用暂停时钟。
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,7 @@
+# 全平台统一 LF：rustfmt（newline_style = "Unix"）与 biome 都只认 LF，
+# Windows runner 默认 autocrlf=true，不钉死这里 CI 在 Windows 上必红。
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.icns binary

@@ -1,0 +1,38 @@
+[package]
+name = "mcpane-provider"
+description = "MCPane provider profiles - domain, store, service"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcpane-adapter-claude = { path = "../mcpane-adapter-claude" }
+mcpane-adapter-codex = { path = "../mcpane-adapter-codex" }
+mcpane-adapter-gemini = { path = "../mcpane-adapter-gemini" }
+mcpane-adapter-grok = { path = "../mcpane-adapter-grok" }
+mcpane-adapter-hermes = { path = "../mcpane-adapter-hermes" }
+mcpane-adapter-openclaw = { path = "../mcpane-adapter-openclaw" }
+mcpane-adapter-opencode = { path = "../mcpane-adapter-opencode" }
+mcpane-config = { path = "../mcpane-config" }
+mcpane-hub-protocol = { path = "../mcpane-hub-protocol" }
+mcpane-secrets = { path = "../mcpane-secrets" }
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+url = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+mcpane-net = { path = "../mcpane-net" }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+axum = { workspace = true }
+tokio = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,110 @@
+[workspace]
+resolver = "3"
+members = [
+    "binaries/mcpane-hub",
+    "crates/mcpane-adapter-claude",
+    "crates/mcpane-adapter-codex",
+    "crates/mcpane-adapter-gemini",
+    "crates/mcpane-adapter-grok",
+    "crates/mcpane-adapter-hermes",
+    "crates/mcpane-adapter-openclaw",
+    "crates/mcpane-adapter-opencode",
+    "crates/mcpane-ccswitch",
+    "crates/mcpane-config",
+    "crates/mcpane-desktop-proxy",
+    "crates/mcpane-hub-catalog",
+    "crates/mcpane-hub-downstream",
+    "crates/mcpane-hub-protocol",
+    "crates/mcpane-net",
+    "crates/mcpane-provider",
+    "crates/mcpane-registry",
+    "crates/mcpane-secrets",
+    "crates/mcpane-storage",
+    "crates/mcpane-sync",
+    "crates/mcpane-usage",
+]
+
+[workspace.package]
+version = "0.6.0"
+edition = "2024"
+rust-version = "1.97.0"
+license = "MIT"
+repository = "https://github.com/yeuxuan/mcpane"
+
+[workspace.dependencies]
+rmcp = "3.1.4"
+axum = "0.8.9"
+tokio = { version = "1.53.1", features = ["full"] }
+# CancellationToken：取消级联（上游取消/超时 → 下游 notifications/cancelled）。
+# 本就在 rmcp 的依赖树里，不新增编译产物。
+tokio-util = "0.7"
+# system-proxy / socks 是「全局出网代理」的地基，缺一不可（ADR-017）：
+# - system-proxy：开启 hyper-util 的 client-proxy-system，让 macOS 系统设置
+#   与 Windows 注册表里的代理被读取。它在 reqwest 的 default 里，而本行
+#   default-features = false 把它一并关掉了——Clash 的「系统代理」开关写的
+#   正是这处设置，不开则该类用户挂了代理 MCPane 也视而不见；
+# - socks：门控 socks5 支持（Clash 的 7891、通用 1080、V2Ray 的 10808 全是
+#   socks5）。0.13 起该 feature 不再拉 tokio-socks，为纯内建实现，代价为零。
+reqwest = { version = "0.13", default-features = false, features = [
+    "json",
+    "rustls",
+    "http2",
+    "system-proxy",
+    "socks",
+] }
+serde = { version = "1", features = ["derive"] }
+# preserve_order：配置文件读写与编辑器展示必须保留用户原有键序
+#（默认 BTreeMap 会把 settings.json/config.toml 的键重排成字母序）。
+serde_json = { version = "1", features = ["preserve_order"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+thiserror = "2"
+anyhow = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+sha2 = "0.10"
+# S3 SigV4 签名（crates/mcpane-sync）；sha2 同门 crate，不引 aws-sdk 全家桶。
+hmac = "0.12"
+subtle = "2"
+rand = "0.9"
+http = "1"
+# SSE 客户端传输（crates/mcpane-hub-downstream/src/sse.rs，自 rmcp 0.8.5 移植）
+# 的直接依赖；三者均已在 rmcp 的依赖树里，不新增编译产物。
+futures = "0.3"
+sse-stream = "0.2"
+pin-project-lite = "0.2"
+# reqwest 只 re-export 了 Url，没有 Host；代理例外判定要按 Ipv4/Ipv6/Domain 分支
+# 匹配，故直接依赖。该 crate 本就在 reqwest 的依赖树里，不增加编译产物。
+url = "2"
+toml_edit = "0.25"
+similar = "3"
+notify = "8.2"
+tempfile = "3"
+keyring = "4.1"
+# 会话时间戳解析（crates/mcpane-usage）：只用 RFC3339 解析，不需要 clock/tz 特性。
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite", "macros", "migrate"] }
+
+# 控制构建产物体积：dev 构建只保留行号级调试信息（target/ 体积大头是 debuginfo）。
+# 需要完整调试信息排查问题时，用 RUSTFLAGS 或临时改回 debug = true。
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+# 发布体积优化（sidecar 随桌面包分发，体积直接进安装包）：
+# opt-level = "s" 体积优先但保留向量化；lto + codegen-units = 1 跨 crate
+# 内联去重；strip 去符号表。不设 panic = "abort"——保住 unwind 语义，
+# 避免 tokio worker 单点 panic 拖死整个 Hub 进程。
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "warn"

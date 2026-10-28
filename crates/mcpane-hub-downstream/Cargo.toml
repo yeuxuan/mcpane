@@ -1,0 +1,57 @@
+[package]
+name = "mcpane-hub-downstream"
+description = "MCPane downstream MCP clients - stdio child process & streamable HTTP"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+rmcp = { workspace = true, features = [
+    "client",
+    "transport-child-process",
+    "transport-streamable-http-client-reqwest",
+    # SSE 传输移植件复用其中公开的重连原语（SseRetryPolicy/FixedInterval）。
+    "client-side-sse",
+    # 旧式 elicitation/create 桥接（elicitation 类型与 handler 方法的门控）。
+    "elicitation",
+    # 下游远程 MCP 的 OAuth（ADR-024）：授权服务器发现、动态注册、PKCE、令牌刷新。
+    "auth",
+] }
+# CredentialStore trait 用 async-trait 声明，文件版实现需要同一个宏（rmcp 依赖树里已有）。
+async-trait = "0.1"
+# "stream"：SSE 传输需要 reqwest 的 bytes_stream。
+reqwest = { workspace = true, features = ["stream"] }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+futures = { workspace = true }
+sse-stream = { workspace = true }
+pin-project-lite = { workspace = true }
+http = { workspace = true }
+mcpane-net = { path = "../mcpane-net" }
+mcpane-hub-protocol = { path = "../mcpane-hub-protocol" }
+
+# Windows 子进程治理（Job Object 杀树 + 抑制黑窗）。两者本就在依赖树里：rmcp 依赖
+# process-wrap 且未关 default 特性，job-object/creation-flags 已启用。版本须与 rmcp
+# 解析到的对齐，否则出现两份 process-wrap，wrapper 类型不同源、套不上。
+[target.'cfg(windows)'.dependencies]
+process-wrap = { version = "9.1", features = ["tokio1"] }
+windows = { version = "0.62", features = ["Win32_System_Threading"] }
+
+[dev-dependencies]
+axum = { workspace = true }
+tempfile = { workspace = true }
+# OAuth 端到端夹具：假授权服务器要校验 PKCE（S256）并解析表单 / 查询串。
+sha2 = { workspace = true }
+base64 = "0.22"
+url = { workspace = true }
+serde = { workspace = true }
+rmcp = { workspace = true, features = ["server", "transport-streamable-http-server", "macros"] }
+mcpane-hub-catalog = { path = "../mcpane-hub-catalog" }
+
+[lints]
+workspace = true

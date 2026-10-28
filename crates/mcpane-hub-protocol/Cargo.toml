@@ -1,0 +1,25 @@
+[package]
+name = "mcpane-hub-protocol"
+description = "MCPane hub control-plane protocol - shared paths, constants, wire commands"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# cli_path 探测 `--version` 要按系统代码页解码子进程输出（unsafe 收敛在那边）。
+mcpane-config = { path = "../mcpane-config" }
+serde = { workspace = true }
+tracing = { workspace = true }
+
+# 检测有效 PATH 要读注册表：自更新重启的进程会丢掉用户 PATH（见 cli_path）。
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"
+
+[dev-dependencies]
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

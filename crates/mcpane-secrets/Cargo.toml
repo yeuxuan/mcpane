@@ -1,0 +1,30 @@
+[package]
+name = "mcpane-secrets"
+description = "MCPane secret store - OS keychain backed, reference-only persistence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+keyring = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+
+# Windows Credential Manager 的 blob 上限是 CRED_MAX_CREDENTIAL_BLOB_SIZE
+# （5*512 = 2560 字节），装不下 OAuth 三件套；超限的走 DPAPI 加密文件。
+[target.'cfg(windows)'.dependencies]
+mcpane-config = { path = "../mcpane-config" }
+mcpane-hub-protocol = { path = "../mcpane-hub-protocol" }
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security_Cryptography",
+] }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
