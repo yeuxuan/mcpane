@@ -6,8 +6,8 @@ name: Platform CI
 # 为什么只有 Windows：三个平台里它是唯一没人编过的那一面——cfg(windows) 的
 # 分支在开发机上根本不参与编译。Linux 由 ci.yml 的 ubuntu job 每推一次都覆盖；
 # macOS 分支在开发机的日常 cargo test 里天天在编，再按 10 倍计费跑一遍是纯
-# 重复，发版前若要正式凭据，用本机的
-# .claude/skills/mcpane-release/scripts/preflight.sh。
+# 重复，发版前若要正式凭据，本地跑
+# bash scripts/release-local.sh --check-apple-distribution 预检。
 #
 # 为什么没有定时巡检：本仓的发版频率（2026-07~08 平均 3-4 天一版）本就高于
 # 任何合理的巡检周期，发版前那次 dispatch 已经把窗口盖住，再加一条每周 cron

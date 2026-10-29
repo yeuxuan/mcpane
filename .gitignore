@@ -36,6 +36,9 @@ apps/desktop/src-tauri/binaries/
 # --- 测试产物 ---
 playwright-report/
 test-results/
+# e2e screenshots spec 会把真实本地数据截进 docs/screenshots/，勿提交；
+# 要放对外演示图时用演示数据并 git add -f
+docs/screenshots/
 
 # --- 编辑器 ---
 .idea/
